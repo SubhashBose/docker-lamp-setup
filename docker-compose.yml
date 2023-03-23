@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  apache:
+    image: 'httpd:2.4'
+    ports:
+      - '80:80'
+    volumes:
+      - './setup/config/apache:/usr/local/apache2/conf'
+      - './setup/logs/apache:/usr/local/apache2/logs'
+      - './setup/src:/home/subhash/public_html'
+    depends_on:
+      - mysql
+      - php74
+      - php56
+    user: 'subhash:subhash'
+
+  mysql:
+    image: 'mysql:5.7'
+    ports:
+      - '3306:3306'
+    volumes:
+      - './setup/data/mysql:/var/lib/mysql'
+      - './setup/config/mysql:/etc/mysql/conf.d'
+    environment:
+      MYSQL_ROOT_PASSWORD: 'my-secret-pw'
+      MYSQL_DATABASE: 'myradb'
+      MYSQL_USER: 'myra-user'
+      MYSQL_PASSWORD: 'myra-secret'
+
+  php74:
+    image: 'php:7.4-fpm'
+    volumes:
+      - './setup/src:/home/subhash/public_html'
+      - './setup/config/php74:/usr/local/etc/php-fpm.d'
+    depends_on:
+      - mysql
+
+  php56:
+    image: 'php:5.6-fpm'
+    volumes:
+      - './setup/src:/home/subhash/public_html'
+      - './setup/config/php56:/usr/local/etc/php-fpm.d'
+    depends_on:
+      - mysql
